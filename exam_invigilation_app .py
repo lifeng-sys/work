@@ -92,7 +92,17 @@ st.session_state.schedule_df = check_conflicts(st.session_state.schedule_df)
 
 # 显示安排表
 st.subheader("📋 当前监考安排")
-st.dataframe(st.session_state.schedule_df, use_container_width=True)
+
+# 为每行添加删除按钮
+edited_df = st.session_state.schedule_df.copy()
+for idx, row in edited_df.iterrows():
+    cols = st.columns([10, 1])  # 左边显示表格内容，右边放删除按钮
+    with cols[0]:
+        st.write(row.to_frame().T.reset_index(drop=True))  # 显示该行
+    with cols[1]:
+        if st.button("❌ 删除", key=f"del_{idx}"):
+            st.session_state.schedule_df = st.session_state.schedule_df.drop(index=idx).reset_index(drop=True)
+            st.experimental_rerun()
 
 # 统计监考次数
 def get_teacher_stats(df):
